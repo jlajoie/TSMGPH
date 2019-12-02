@@ -1,0 +1,23 @@
+## Interface: 11303
+## Title: TSMGPH
+## Notes: TradeSkillMaster Gold per Hour
+## Author: Vexation
+## Version: 0.1
+## RequiredDeps: TradeSkillMaster
+## SavedVariables: TSMGPHDB
+
+embeds.xml
+
+# Libs
+Modules\Libs\TSMGPHLoader.lua
+
+# Options
+Modules\Options\TSMGPHOptions.lua
+Modules\Options\AllTab\TSMGPHOptionsAll.lua
+Modules\Options\UnsetTab\TSMGPHOptionsUnset.lua
+
+# GUI
+Modules\GUI\TSMGPHGui.lua
+
+# Main
+TSMGPH.lua
