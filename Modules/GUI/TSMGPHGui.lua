@@ -3,7 +3,7 @@ local TSMGPHGui = TSMGPHLoader:CreateModule("TSMGPHGui");
 local AceGUI = LibStub("AceGUI-3.0")
 local frame
 local startTime = time()
-local startGold = 0
+local startGold = nil
 
 local button
 local simpleGroup
@@ -44,7 +44,7 @@ function TSMGPHGui:Show()
         frame:SetWidth(420)
         frame:SetTitle("TSM Gold per Hour")
         frame:SetLayout("Flow")
-        if startGold == 0 then
+        if startGold == nil then
             startGold = TSMGPHGui:GetInventoryValue()
         end
         if not simpleGroup then
@@ -91,27 +91,17 @@ function TSMGPHGui:Show()
 end
 
 function TSMGPHGui:Load()
-    local startTimeLabelText = date("%m/%d/%y %H:%M:%S", startTime)
-    local startingGoldLabelText = TSMGPHGui:Round(startGold)
-    local goldEarnedLabelText = TSMGPHGui:Round(TSMGPHGui:GetInventoryValue() - startGold)
-    local goldEarnedPerHourLabelText = TSMGPHGui:Round((TSMGPHGui:GetInventoryValue() - startGold) / (time() - startTime))
-    if startTimeLabel then
+    if startTimeLabel and startingGoldLabel and goldEarnedLabel and goldEarnedPerHourLabel then
+        local startTimeLabelText = date("%m/%d/%y %H:%M:%S", startTime)
+        local startingGoldLabelText = TSMGPHGui:Round(startGold)
+        local goldEarnedLabelText = TSMGPHGui:Round(TSMGPHGui:GetInventoryValue() - startGold)
+        local goldEarnedPerHourLabelText = TSMGPHGui:Round((TSMGPHGui:GetInventoryValue() - startGold) / ((time() - startTime) / 3600))
         startTimeLabel:SetText('Start time: ' ..  startTimeLabelText)
-    end
-
-    if startingGoldLabel then
         startingGoldLabel:SetText('Starting gold: ' ..  startingGoldLabelText)
-    end
-
-    if goldEarnedLabel then
         goldEarnedLabel:SetText('Gold earned: ' ..  goldEarnedLabelText)
-    end
-    
-    if goldEarnedPerHourLabel then
         goldEarnedPerHourLabel:SetText('Gold earned per hour: ' .. goldEarnedPerHourLabelText)
     end
 end
-
 
 function TSMGPHGui:Reset()
     startTime = time()
@@ -125,5 +115,5 @@ function TSMGPHGui:SetGoldEarnedLabel(newLabel)
 end
 
 function TSMGPHGui:Round(num)
-    return strmatch(''..num, '%d*%.?%d?%d?') or 0
+    return strmatch(''..num, '-?%d*%.?%d?%d?') or '0'
 end
