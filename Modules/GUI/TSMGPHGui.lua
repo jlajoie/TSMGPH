@@ -1,19 +1,9 @@
 local TSMGPHGui = TSMGPHLoader:CreateModule("TSMGPHGui");
 
 local AceGUI = LibStub("AceGUI-3.0")
-local frame
-local startTime = time()
-local startGold = nil
-
-local button
-local simpleGroup
-local startTimeLabel
-local startingGoldLabel
-local goldEarnedLabel
-local goldEarnedPerHourLabel
+local frame, button, simpleGroupm, startTimeLabel, startingGoldLabel, goldEarnedLabel, goldEarnedPerHourLabel
 
  function TSMGPHGui:GetInventoryValue()
-    local TSM_API = _G.TSM_API
     local total, bag, slots, index
     total = 0
     for bag = 0, 4 do
@@ -22,10 +12,12 @@ local goldEarnedPerHourLabel
             local icon, itemCount, locked, quality, readable, lootable, itemLink, isFiltered, noValue, itemID = GetContainerItemInfo(bag, index)
             if itemCount then
                 -- Always use vendorsell for greys
-                if quality == 0 then
-                    total = total + (TSM_API.GetCustomPriceValue("vendorsell", "i:" .. itemID) or 0) * itemCount
-                else
-                    total = total + (TSM_API.GetCustomPriceValue(TSMGPH.db.global[''..itemID] or "vendorsell", "i:" .. itemID) or 0) * itemCount
+                if not TSMGPH.db.global[''..itemID] == 'ignore' then
+                    if quality == 0 then
+                        total = total + (_G.TSM_API.GetCustomPriceValue("vendorsell", "i:" .. itemID) or 0) * itemCount
+                    else
+                        total = total + (_G.TSM_API.GetCustomPriceValue(TSMGPH.db.global[''..itemID] or "vendorsell", "i:" .. itemID) or 0) * itemCount
+                    end
                 end
             end
         end
@@ -39,13 +31,27 @@ end
 
 function TSMGPHGui:Show()
     if not frame then
-        frame = AceGUI:Create("Frame")
-        frame:SetHeight(120)
-        frame:SetWidth(420)
-        frame:SetTitle("TSM Gold per Hour")
-        frame:SetLayout("Flow")
-        if startGold == nil then
-            startGold = TSMGPHGui:GetInventoryValue()
+        frame = CreateFrame("Frame", "TSMGPHFrame", UIParent)
+        frame:SetSize(120, 420)
+        frame:SetPoint("CENTER")
+        local texture = frame:CreateTexture() 
+        texture:SetAllPoints() 
+        texture:SetTexture(1,1,1,1) 
+        frame.background = texture 
+        
+        local content = CreateFrame("Frame", nil, scrollframe) 
+        content:SetSize(128, 128) 
+        local texture = content:CreateTexture() 
+        texture:SetAllPoints() 
+        texture:SetTexture("Interface\\GLUES\\MainMenu\\Glues-BlizzardLogo") 
+        content.texture = texture 
+        scrollframe.content = content 
+
+        if not TSMGPH.db.char['startGold'] then
+            TSMGPH.db.char['startGold'] = TSMGPHGui:GetInventoryValue()
+        end
+        if not TSMGPH.db.char['startTime'] then
+            TSMGPH.db.char['startTime'] = time()
         end
         if not simpleGroup then
             simpleGroup = AceGUI:Create('SimpleGroup')
@@ -92,20 +98,20 @@ end
 
 function TSMGPHGui:Load()
     if startTimeLabel and startingGoldLabel and goldEarnedLabel and goldEarnedPerHourLabel then
-        local startTimeLabelText = date("%m/%d/%y %H:%M:%S", startTime)
-        local startingGoldLabelText = TSMGPHGui:Round(startGold)
-        local goldEarnedLabelText = TSMGPHGui:Round(TSMGPHGui:GetInventoryValue() - startGold)
-        local goldEarnedPerHourLabelText = TSMGPHGui:Round((TSMGPHGui:GetInventoryValue() - startGold) / ((time() - startTime) / 3600))
-        startTimeLabel:SetText('Start time: ' ..  startTimeLabelText)
-        startingGoldLabel:SetText('Starting gold: ' ..  startingGoldLabelText)
-        goldEarnedLabel:SetText('Gold earned: ' ..  goldEarnedLabelText)
-        goldEarnedPerHourLabel:SetText('Gold earned per hour: ' .. goldEarnedPerHourLabelText)
+        TSMGPH.db.char['startTimeLabelText'] = date("%m/%d/%y %H:%M:%S", TSMGPH.db.char['startTime'])
+        TSMGPH.db.char['startingGoldLabelText'] = TSMGPHGui:Round(TSMGPH.db.char['startGold'])
+        TSMGPH.db.char['goldEarnedLabelText'] = TSMGPHGui:Round(TSMGPHGui:GetInventoryValue() - TSMGPH.db.char['startGold'])
+        TSMGPH.db.char['goldEarnedPerHourLabelText'] = TSMGPHGui:Round((TSMGPHGui:GetInventoryValue() - TSMGPH.db.char['startGold']) / ((time() - TSMGPH.db.char['startTime']) / 3600))
+        startTimeLabel:SetText('Start time: ' ..  TSMGPH.db.char['startTimeLabelText'])
+        startingGoldLabel:SetText('Starting gold: ' ..  TSMGPH.db.char['startingGoldLabelText'])
+        goldEarnedLabel:SetText('Gold earned: ' ..  TSMGPH.db.char['goldEarnedLabelText'])
+        goldEarnedPerHourLabel:SetText('Gold earned per hour: ' .. TSMGPH.db.char['goldEarnedPerHourLabelText'])
     end
 end
 
 function TSMGPHGui:Reset()
-    startTime = time()
-    startGold = TSMGPHGui:GetInventoryValue()
+    TSMGPH.db.char['startTime'] = time()
+    TSMGPH.db.char['startGold'] = TSMGPHGui:GetInventoryValue()
 end
 
 function TSMGPHGui:SetGoldEarnedLabel(newLabel)
@@ -115,5 +121,9 @@ function TSMGPHGui:SetGoldEarnedLabel(newLabel)
 end
 
 function TSMGPHGui:Round(num)
-    return strmatch(''..num, '-?%d*%.?%d?%d?') or '0'
+    if num then
+        return strmatch(''..num, '-?%d*%.?%d?%d?') or 'N/A'
+    else
+        return 'N/A'
+    end
 end
