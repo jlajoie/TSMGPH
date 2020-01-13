@@ -1,4 +1,4 @@
-local TSMGPHOptions = TSMGPHLoader:ImportModule("TSMGPHOptions");
+local TSMGPHOptions = TSMGPHLoader:ImportModule('TSMGPHOptions');
 
 TSMGPHOptions.tabs.unset = {...}
 
@@ -20,7 +20,7 @@ function TSMGPHOptions.tabs.unset:Initialize()
             if itemCount and _G.TSM_API.GetCustomPriceValue('vendorsell', 'i:' .. itemID) and  quality > 0 and not TSMGPH.db.global[''..itemID] then
                 args['select'..itemID] = {
                     name = itemLink,
-                    type = "select",
+                    type = 'select',
                     values = {
                         dbmarket = 'Auction',
                         vendorsell = 'Vendor',
