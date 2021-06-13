@@ -17,12 +17,16 @@ function TSMGPHOptions.tabs.all:Initialize()
         slots = GetContainerNumSlots(bag)
         for index = 1, slots do
             local _, itemCount, _, quality, _, _, itemLink, _, _, itemID = GetContainerItemInfo(bag, index)
-            if itemCount and _G.TSM_API.GetCustomPriceValue('vendorsell', 'i:' .. itemID) and  quality > 0 then
+            if itemCount and (
+                _G.TSM_API.GetCustomPriceValue('vendorsell', 'i:' .. itemID) or 
+                _G.TSM_API.GetCustomPriceValue('dbmarket', 'i:' .. itemID)
+            ) and quality > 0 then
                 args['select'..itemID] = {
                     name = itemLink,
                     type = 'select',
                     values = {
-                        dbmarket = 'Auction',
+                        dbminbuyout  = 'Auction',
+                        destroy = 'Disenchant',
                         vendorsell = 'Vendor',
                         ignore = 'Ignore',
                     },

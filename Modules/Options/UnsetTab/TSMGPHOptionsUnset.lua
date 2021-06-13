@@ -17,12 +17,20 @@ function TSMGPHOptions.tabs.unset:Initialize()
         slots = GetContainerNumSlots(bag)
         for index = 1, slots do
             local _, itemCount, _, quality, _, _, itemLink, _, _, itemID = GetContainerItemInfo(bag, index)
-            if itemCount and _G.TSM_API.GetCustomPriceValue('vendorsell', 'i:' .. itemID) and  quality > 0 and not TSMGPH.db.global[''..itemID] then
+            if itemCount and (
+                _G.TSM_API.GetCustomPriceValue('vendorsell', 'i:' .. itemID) or 
+                _G.TSM_API.GetCustomPriceValue('dbminbuyout', 'i:' .. itemID) or
+                _G.TSM_API.GetCustomPriceValue('destroy', 'i:' .. itemID)
+            ) and (
+                quality ~= 0 or
+                quality == 2 and _G.TSM_API.GetCustomPriceValue('destroy', 'i:' .. itemID)
+            ) and not TSMGPH.db.global[''..itemID] then
                 args['select'..itemID] = {
                     name = itemLink,
                     type = 'select',
                     values = {
-                        dbmarket = 'Auction',
+                        dbminbuyout  = 'Auction',
+                        destroy = 'Disenchant',
                         vendorsell = 'Vendor',
                         ignore = 'Ignore',
                     },

@@ -12,11 +12,16 @@ local frame, button, simpleGroupm, startTimeLabel, startingGoldLabel, goldEarned
             local icon, itemCount, locked, quality, readable, lootable, itemLink, isFiltered, noValue, itemID = GetContainerItemInfo(bag, index)
             if itemCount then
                 -- Always use vendorsell for greys
+                -- Always use disenchant for greens
                 -- if not TSMGPH.db.global[''..itemID] == 'ignore' then
                 if TSMGPH.db.global[''..itemID] ~= 'ignore' then
                     if quality == 0 then
                         total = total + (_G.TSM_API.GetCustomPriceValue('vendorsell', 'i:' .. itemID) or 0) * itemCount
-                    else
+                    elseif quality == 2 and _G.TSM_API.GetCustomPriceValue('destroy', 'i:' .. itemID) then
+                        total = total + (_G.TSM_API.GetCustomPriceValue('destroy', 'i:' .. itemID) or 0) * itemCount
+                    elseif quality == 1 then
+                        total = total + (_G.TSM_API.GetCustomPriceValue(TSMGPH.db.global[''..itemID] or 'vendorsell', 'i:' .. itemID) or 0) * itemCount
+                    else 
                         total = total + (_G.TSM_API.GetCustomPriceValue(TSMGPH.db.global[''..itemID] or 'vendorsell', 'i:' .. itemID) or 0) * itemCount
                     end
                 end
@@ -37,10 +42,6 @@ function TSMGPHGui:Initialize()
       frame = CreateFrame('Frame', "TSMGPHFrame", UIParent)
       frame.texture = frame:CreateTexture()
       frame.texture:SetAllPoints(frame)
-      frame:SetBackdrop( {
-          bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
-      });
-      frame:SetBackdropColor(1, 1, 1, 1)
       frame:SetMovable(true)
       frame:SetPoint("TOPLEFT", 0, 0)
 
