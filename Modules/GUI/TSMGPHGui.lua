@@ -7,22 +7,22 @@ local frame, button, simpleGroupm, startTimeLabel, startingGoldLabel, goldEarned
     local total, bag, slots, index
     total = 0
     for bag = 0, 4 do
-        slots=GetContainerNumSlots(bag)
+        slots=C_Container.GetContainerNumSlots(bag)
         for index = 1, slots do
-            local icon, itemCount, locked, quality, readable, lootable, itemLink, isFiltered, noValue, itemID = GetContainerItemInfo(bag, index)
-            if itemCount then
+            local info = C_Container.GetContainerItemInfo(bag, index)
+            if info and info.stackCount then
                 -- Always use vendorsell for greys
                 -- Always use disenchant for greens
                 -- if not TSMGPH.db.global[''..itemID] == 'ignore' then
-                if TSMGPH.db.global[''..itemID] ~= 'ignore' then
+                if TSMGPH.db.global[''..info.itemID] ~= 'ignore' then
                     if quality == 0 then
-                        total = total + (_G.TSM_API.GetCustomPriceValue('vendorsell', 'i:' .. itemID) or 0) * itemCount
-                    elseif quality == 2 and _G.TSM_API.GetCustomPriceValue('destroy', 'i:' .. itemID) then
-                        total = total + (_G.TSM_API.GetCustomPriceValue('destroy', 'i:' .. itemID) or 0) * itemCount
+                        total = total + (_G.TSM_API.GetCustomPriceValue('vendorsell', 'i:' .. info.itemID) or 0) * info.stackCount
+                    elseif quality == 2 and _G.TSM_API.GetCustomPriceValue('destroy', 'i:' .. info.itemID) then
+                        total = total + (_G.TSM_API.GetCustomPriceValue('destroy', 'i:' .. info.itemID) or 0) * info.stackCount
                     elseif quality == 1 then
-                        total = total + (_G.TSM_API.GetCustomPriceValue(TSMGPH.db.global[''..itemID] or 'vendorsell', 'i:' .. itemID) or 0) * itemCount
+                        total = total + (_G.TSM_API.GetCustomPriceValue(TSMGPH.db.global[''..info.itemID] or 'vendorsell', 'i:' .. info.itemID) or 0) * info.stackCount
                     else 
-                        total = total + (_G.TSM_API.GetCustomPriceValue(TSMGPH.db.global[''..itemID] or 'vendorsell', 'i:' .. itemID) or 0) * itemCount
+                        total = total + (_G.TSM_API.GetCustomPriceValue(TSMGPH.db.global[''..info.itemID] or 'vendorsell', 'i:' .. info.itemID) or 0) * info.stackCount
                     end
                 end
             end

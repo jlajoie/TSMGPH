@@ -1,4 +1,4 @@
-## Interface: 11303
+## Interface: 110100, 40402, 11506
 ## Title: TSMGPH
 ## Notes: TradeSkillMaster Gold per Hour
 ## Author: Vexation
